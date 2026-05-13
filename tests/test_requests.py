@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from cds_downloader.requests import (
     build_daily_tasks,
     build_hourly_tasks,

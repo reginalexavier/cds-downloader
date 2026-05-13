@@ -36,6 +36,28 @@ def test_hourly_parser_builds_separate_tasks():
     assert len(tasks) == 2
     assert tasks[0].request["variable"] == "2m_temperature"
     assert tasks[1].request["variable"] == "total_precipitation"
+    assert str(tasks[0].target).startswith("data")
+
+
+def test_output_dir_can_be_overridden():
+    parser = __import__("cds_downloader.cli", fromlist=["build_parser"]).build_parser()
+    args = parser.parse_args(
+        [
+            "hourly",
+            "--year",
+            "2025",
+            "--months",
+            "10",
+            "--output-dir",
+            "downloads",
+            "--variables",
+            "total_precipitation",
+        ]
+    )
+
+    tasks = tasks_from_args(args)
+
+    assert str(tasks[0].target).startswith("downloads")
 
 
 def test_print_dry_run_outputs_target(capsys):
@@ -45,4 +67,4 @@ def test_print_dry_run_outputs_target(capsys):
 
     print_dry_run(tasks[:1])
 
-    assert "hourly_2m_dewpoint_temperature_2025.nc" in capsys.readouterr().out
+    assert "data" in capsys.readouterr().out

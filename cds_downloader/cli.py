@@ -14,6 +14,7 @@ from .config import (
     DEFAULT_AREA,
     DEFAULT_DATA_FORMAT,
     DEFAULT_DOWNLOAD_FORMAT,
+    DEFAULT_OUTPUT_DIR,
     HOURLY_VARIABLES,
 )
 from .downloader import print_dry_run, run_downloads
@@ -39,7 +40,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         metavar=("NORTH", "WEST", "SOUTH", "EAST"),
         help="Bounding box in CDS order: north west south east.",
     )
-    parser.add_argument("--output-dir", type=Path, default=Path("."), help="Directory for downloaded files.")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(DEFAULT_OUTPUT_DIR),
+        help="Directory for downloaded files. Defaults to data/.",
+    )
     parser.add_argument(
         "--data-format",
         choices=("netcdf", "grib"),

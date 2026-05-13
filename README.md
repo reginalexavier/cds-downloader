@@ -46,4 +46,4 @@ uv run cds-downloader daily --year 2025 --months 10 --dry-run
 uv run cds-downloader hourly --year 2025 --months 10 --dry-run
 ```
 
-Arquivos são salvos no diretório atual por padrão. Use `--output-dir data` para escolher outro destino.
+Arquivos são salvos em `data/` por padrão. Use `--output-dir downloads` para escolher outro destino.
