@@ -2,6 +2,9 @@ from pathlib import Path
 
 import pytest
 from cds_downloader.requests import (
+    CommonRequestOptions,
+    DailyRequestOptions,
+    HourlyRequestOptions,
     build_daily_tasks,
     build_hourly_tasks,
     file_extension,
@@ -9,23 +12,30 @@ from cds_downloader.requests import (
     normalize_time,
 )
 
+EXPECTED_DAILY_TASKS = 3
+EXPECTED_HOURLY_TASKS = 2
+
 
 def test_build_daily_tasks_splits_aggregated_and_accumulated_variables():
     tasks = build_daily_tasks(
-        year=2025,
-        months=["10", "11"],
-        days=["1", "2"],
-        area=[-15.36, -55.91, -17.24, -53.14],
-        output_dir=Path("data"),
-        data_format="netcdf",
-        download_format="unarchived",
-        daily_statistics=["daily_mean", "daily_maximum"],
-        accumulated_time="0:00",
-        daily_variables=["2m_temperature"],
-        accumulated_variables=["total_precipitation"],
+        DailyRequestOptions(
+            common=CommonRequestOptions(
+                year=2025,
+                months=["10", "11"],
+                days=["1", "2"],
+                area=[-15.36, -55.91, -17.24, -53.14],
+                output_dir=Path("data"),
+                data_format="netcdf",
+                download_format="unarchived",
+            ),
+            daily_statistics=["daily_mean", "daily_maximum"],
+            accumulated_time="0:00",
+            daily_variables=["2m_temperature"],
+            accumulated_variables=["total_precipitation"],
+        )
     )
 
-    assert len(tasks) == 3
+    assert len(tasks) == EXPECTED_DAILY_TASKS
     assert tasks[0].dataset == "derived-era5-land-daily-statistics"
     assert tasks[0].request["daily_statistic"] == "daily_mean"
     assert "data_format" not in tasks[0].request
@@ -42,17 +52,21 @@ def test_build_daily_tasks_splits_aggregated_and_accumulated_variables():
 
 def test_build_hourly_tasks_creates_one_request_per_variable():
     tasks = build_hourly_tasks(
-        year=2025,
-        months=[10],
-        days=[1, 2],
-        area=[-15.36, -55.91, -17.24, -53.14],
-        output_dir=Path("data"),
-        data_format="netcdf",
-        download_format="unarchived",
-        variables=["2m_temperature", "total_precipitation"],
+        HourlyRequestOptions(
+            common=CommonRequestOptions(
+                year=2025,
+                months=[10],
+                days=[1, 2],
+                area=[-15.36, -55.91, -17.24, -53.14],
+                output_dir=Path("data"),
+                data_format="netcdf",
+                download_format="unarchived",
+            ),
+            variables=["2m_temperature", "total_precipitation"],
+        )
     )
 
-    assert len(tasks) == 2
+    assert len(tasks) == EXPECTED_HOURLY_TASKS
     assert [task.request["variable"] for task in tasks] == ["2m_temperature", "total_precipitation"]
     assert tasks[0].request["time"][0] == "00:00"
     assert tasks[0].request["time"][-1] == "23:00"
@@ -63,7 +77,7 @@ def test_build_hourly_tasks_creates_one_request_per_variable():
 def test_normalize_numbers_zero_pads_and_validates_range():
     assert normalize_numbers(["1", 12], minimum=1, maximum=12) == ["01", "12"]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="must be between"):
         normalize_numbers(["13"], minimum=1, maximum=12)
 
 

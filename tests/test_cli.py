@@ -1,6 +1,8 @@
 from cds_downloader.cli import main, tasks_from_args
 from cds_downloader.downloader import print_dry_run
 
+EXPECTED_HOURLY_TASKS = 2
+
 
 def test_daily_dry_run_does_not_call_downloader(monkeypatch, capsys):
     def fail_run_downloads(*args, **kwargs):
@@ -18,22 +20,20 @@ def test_daily_dry_run_does_not_call_downloader(monkeypatch, capsys):
 
 def test_hourly_parser_builds_separate_tasks():
     parser = __import__("cds_downloader.cli", fromlist=["build_parser"]).build_parser()
-    args = parser.parse_args(
-        [
-            "hourly",
-            "--year",
-            "2025",
-            "--months",
-            "10",
-            "--variables",
-            "2m_temperature",
-            "total_precipitation",
-        ]
-    )
+    args = parser.parse_args([
+        "hourly",
+        "--year",
+        "2025",
+        "--months",
+        "10",
+        "--variables",
+        "2m_temperature",
+        "total_precipitation",
+    ])
 
     tasks = tasks_from_args(args)
 
-    assert len(tasks) == 2
+    assert len(tasks) == EXPECTED_HOURLY_TASKS
     assert tasks[0].request["variable"] == "2m_temperature"
     assert tasks[1].request["variable"] == "total_precipitation"
     assert str(tasks[0].target).startswith("data")
@@ -41,19 +41,17 @@ def test_hourly_parser_builds_separate_tasks():
 
 def test_output_dir_can_be_overridden():
     parser = __import__("cds_downloader.cli", fromlist=["build_parser"]).build_parser()
-    args = parser.parse_args(
-        [
-            "hourly",
-            "--year",
-            "2025",
-            "--months",
-            "10",
-            "--output-dir",
-            "downloads",
-            "--variables",
-            "total_precipitation",
-        ]
-    )
+    args = parser.parse_args([
+        "hourly",
+        "--year",
+        "2025",
+        "--months",
+        "10",
+        "--output-dir",
+        "downloads",
+        "--variables",
+        "total_precipitation",
+    ])
 
     tasks = tasks_from_args(args)
 
