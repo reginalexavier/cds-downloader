@@ -48,6 +48,8 @@ uv run cds-downloader hourly --year 2025 --months 10 --dry-run
 
 Arquivos são salvos em `data/` por padrão. Use `--output-dir downloads` para escolher outro destino.
 
+Use `--max-workers` para executar múltiplas requests independentes em paralelo. O padrão é `--max-workers 1`, ou seja, download sequencial. Valores baixos como `2` ou `3` costumam ser mais seguros; valores altos podem apenas aumentar fila, lentidão ou chance de erro por limite do CDS.
+
 ## Formatos
 
 O subfluxo diário agregado usa o dataset `derived-era5-land-daily-statistics`. O processo da API não expõe `data_format` ou `download_format`, então esses campos não são enviados. No padrão de uma variável por request usado por esta CLI, o arquivo retornado pelo `cdsapi` é NetCDF/HDF5 e é salvo como `.nc`.
