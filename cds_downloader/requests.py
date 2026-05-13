@@ -88,11 +88,14 @@ def build_daily_tasks(
     days = normalize_numbers(days, minimum=1, maximum=31)
     area = list(area)
     accumulated_time = normalize_time(accumulated_time)
-    extension = file_extension(data_format, download_format)
+    accumulated_extension = file_extension(data_format, download_format)
 
     tasks: list[DownloadTask] = []
     for variable in daily_variables:
         for statistic in daily_statistics:
+            # The CDS process for post-processed daily statistics exposes neither
+            # data_format nor download_format. The retrieved asset is NetCDF/HDF5
+            # for the one-variable-per-request pattern used by this CLI.
             request = {
                 "variable": variable,
                 "year": str(year),
@@ -102,10 +105,8 @@ def build_daily_tasks(
                 "time_zone": time_zone,
                 "frequency": frequency,
                 "area": area,
-                "data_format": data_format,
-                "download_format": download_format,
             }
-            target = output_dir / f"daily_{variable}_{statistic}_{year}.{extension}"
+            target = output_dir / f"daily_{variable}_{statistic}_{year}.nc"
             tasks.append(DownloadTask(DAILY_DATASET, request, target))
 
     for variable in accumulated_variables:
@@ -119,7 +120,7 @@ def build_daily_tasks(
             "download_format": download_format,
             "area": area,
         }
-        target = output_dir / f"daily_{variable}_accumulated_{year}.{extension}"
+        target = output_dir / f"daily_{variable}_accumulated_{year}.{accumulated_extension}"
         tasks.append(DownloadTask(HOURLY_DATASET, request, target))
 
     return tasks
