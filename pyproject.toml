@@ -20,7 +20,7 @@ build-backend = "hatchling.build"
 packages = ["cds_downloader"]
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 src = ["cds_downloader", "tests"]
 
 [tool.ruff.lint]
