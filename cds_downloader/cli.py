@@ -18,7 +18,14 @@ from .config import (
     HOURLY_VARIABLES,
 )
 from .downloader import print_dry_run, run_downloads
-from .requests import all_days, build_daily_tasks, build_hourly_tasks
+from .requests import (
+    CommonRequestOptions,
+    DailyRequestOptions,
+    HourlyRequestOptions,
+    all_days,
+    build_daily_tasks,
+    build_hourly_tasks,
+)
 
 
 def positive_int(value: str) -> int:
@@ -109,27 +116,29 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def tasks_from_args(args: argparse.Namespace):
-    common = {
-        "year": args.year,
-        "months": args.months,
-        "days": args.days,
-        "area": args.area,
-        "output_dir": args.output_dir,
-        "data_format": args.data_format,
-        "download_format": args.download_format,
-    }
+    common = CommonRequestOptions(
+        year=args.year,
+        months=args.months,
+        days=args.days,
+        area=args.area,
+        output_dir=args.output_dir,
+        data_format=args.data_format,
+        download_format=args.download_format,
+    )
 
     if args.command == "daily":
         return build_daily_tasks(
-            **common,
-            daily_statistics=args.daily_statistics,
-            accumulated_time=args.accumulated_time,
-            daily_variables=args.daily_variables,
-            accumulated_variables=args.accumulated_variables,
+            DailyRequestOptions(
+                common=common,
+                daily_statistics=args.daily_statistics,
+                accumulated_time=args.accumulated_time,
+                daily_variables=args.daily_variables,
+                accumulated_variables=args.accumulated_variables,
+            )
         )
 
     if args.command == "hourly":
-        return build_hourly_tasks(**common, variables=args.variables)
+        return build_hourly_tasks(HourlyRequestOptions(common=common, variables=args.variables))
 
     raise ValueError(f"Unsupported command: {args.command}")
 

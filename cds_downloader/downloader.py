@@ -7,6 +7,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+import cdsapi
+
 from .requests import DownloadTask
 
 
@@ -31,8 +33,6 @@ def _client_kwargs(*, timeout: int | None, retry_max: int, quiet: bool) -> dict[
 
 
 def download_task(task: DownloadTask, *, timeout: int | None, retry_max: int, quiet: bool) -> Path:
-    import cdsapi
-
     task.target.parent.mkdir(parents=True, exist_ok=True)
     client = cdsapi.Client(**_client_kwargs(timeout=timeout, retry_max=retry_max, quiet=quiet))
     print(f"Downloading {task.dataset} -> {task.target}")
@@ -52,16 +52,12 @@ def run_downloads(
         raise ValueError("--max-workers must be at least 1.")
 
     if max_workers == 1:
-        return [
-            download_task(task, timeout=timeout, retry_max=retry_max, quiet=quiet)
-            for task in tasks
-        ]
+        return [download_task(task, timeout=timeout, retry_max=retry_max, quiet=quiet) for task in tasks]
 
     completed = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [
-            executor.submit(download_task, task, timeout=timeout, retry_max=retry_max, quiet=quiet)
-            for task in tasks
+            executor.submit(download_task, task, timeout=timeout, retry_max=retry_max, quiet=quiet) for task in tasks
         ]
         for future in as_completed(futures):
             completed.append(future.result())
