@@ -1,7 +1,17 @@
-from cds_downloader.cli import main, tasks_from_args
+from cds_downloader.cli import build_parser, main, tasks_from_args
 from cds_downloader.downloader import print_dry_run
 
 EXPECTED_HOURLY_TASKS = 2
+
+
+def test_help_mentions_cds_api_token_setup(capsys):
+    parser = build_parser()
+
+    parser.print_help()
+
+    output = capsys.readouterr().out
+    assert "~/.cdsapirc" in output
+    assert "https://cds.climate.copernicus.eu/how-to-api" in output
 
 
 def test_daily_dry_run_does_not_call_downloader(monkeypatch, capsys):

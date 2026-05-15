@@ -27,6 +27,11 @@ from .requests import (
     build_hourly_tasks,
 )
 
+AUTH_HELP = (
+    "Before downloading, configure your CDS API token in ~/.cdsapirc. "
+    "Setup instructions: https://cds.climate.copernicus.eu/how-to-api"
+)
+
 
 def positive_int(value: str) -> int:
     parsed = int(value)
@@ -73,7 +78,10 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Download ERA5-Land data from the Copernicus CDS API.")
+    parser = argparse.ArgumentParser(
+        description="Download ERA5-Land data from the Copernicus CDS API.",
+        epilog=AUTH_HELP,
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     daily = subparsers.add_parser("daily", help="Download daily frequency outputs.")
