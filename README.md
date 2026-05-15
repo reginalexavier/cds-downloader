@@ -11,6 +11,11 @@ url: https://cds.climate.copernicus.eu/api
 key: <PERSONAL-ACCESS-TOKEN>
 ```
 
+```bash
+echo "url: https://cds.climate.copernicus.eu/api"  >> ~/.cdsapirc
+echo "key: <PERSONAL-ACCESS-TOKEN>"  >> ~/.cdsapirc
+```
+
 Também é necessário aceitar os termos de uso dos datasets no portal CDS.
 
 ## Instalação
