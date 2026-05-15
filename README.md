@@ -90,6 +90,30 @@ Arquivos são salvos em `data/` por padrão. Use `--output-dir downloads` para e
 
 Use `--max-workers` para executar múltiplas requests independentes em paralelo. O padrão é `--max-workers 1`, ou seja, download sequencial. Valores baixos como `2` ou `3` costumam ser mais seguros; valores altos podem apenas aumentar fila, lentidão ou chance de erro por limite do CDS.
 
+## Variáveis
+
+O CDS oferece muitas variáveis. Esta CLI foi pensada para um conjunto pequeno usado nos fluxos originais:
+
+| Fluxo | Dataset | Variável | Tratamento |
+| --- | --- | --- | --- |
+| `daily` | `derived-era5-land-daily-statistics` | `2m_dewpoint_temperature` | Estatísticas diárias (`daily_mean` por padrão) |
+| `daily` | `derived-era5-land-daily-statistics` | `2m_temperature` | Estatísticas diárias (`daily_mean` por padrão) |
+| `daily` | `derived-era5-land-daily-statistics` | `10m_u_component_of_wind` | Estatísticas diárias (`daily_mean` por padrão) |
+| `daily` | `derived-era5-land-daily-statistics` | `10m_v_component_of_wind` | Estatísticas diárias (`daily_mean` por padrão) |
+| `daily` | `reanalysis-era5-land` | `surface_solar_radiation_downwards` | Valor acumulado no horário configurado (`00:00` por padrão) |
+| `daily` | `reanalysis-era5-land` | `total_precipitation` | Valor acumulado no horário configurado (`00:00` por padrão) |
+| `hourly` | `reanalysis-era5-land` | Todas as 6 variáveis acima | Série horária, uma request por variável |
+
+Para baixar outra variável já compatível com o mesmo dataset, use os parâmetros da CLI:
+
+```bash
+uv run cds-downloader hourly --year 2025 --months 10 --variables total_precipitation
+uv run cds-downloader daily --year 2025 --months 10 --daily-variables 2m_temperature
+uv run cds-downloader daily --year 2025 --months 10 --accumulated-variables total_precipitation
+```
+
+Para tornar novas variáveis parte dos defaults, edite `cds_downloader/config.py`. Antes de adicionar uma variável ao fluxo `daily`, confira na documentação do dataset se ela pertence ao produto de estatísticas diárias ou se deve ser tratada como acumulada via `reanalysis-era5-land`.
+
 ## Formatos
 
 O subfluxo diário agregado usa o dataset `derived-era5-land-daily-statistics`. O processo da API não expõe `data_format` ou `download_format`, então esses campos não são enviados. No padrão de uma variável por request usado por esta CLI, o arquivo retornado pelo `cdsapi` é NetCDF/HDF5 e é salvo como `.nc`.
