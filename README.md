@@ -4,7 +4,7 @@ CLI simples para baixar dados ERA5-Land via Copernicus Climate Data Store API.
 
 ## Autenticação
 
-Configure o arquivo `~/.cdsapirc` antes de baixar dados:
+Configure o arquivo [`~/.cdsapirc`](https://cds.climate.copernicus.eu/how-to-api) antes de baixar dados:
 
 ```yaml
 url: https://cds.climate.copernicus.eu/api
@@ -36,13 +36,13 @@ cds-downloader daily --year 2025 --months 10 11 12
 Em outro computador, publique ou disponibilize este projeto em um repositório Git e instale com:
 
 ```bash
-uv tool install git+https://github.com/seu-usuario/cds-downloader.git
+uv tool install git+https://github.com/reginalexavier/cds-downloader.git
 ```
 
 Para uso pontual, sem instalação permanente:
 
 ```bash
-uvx --from git+https://github.com/seu-usuario/cds-downloader.git cds-downloader daily --year 2025 --months 10
+uvx --from git+https://github.com/reginalexavier/cds-downloader.git cds-downloader daily --year 2025 --months 10
 ```
 
 Se o comando instalado não aparecer no terminal, rode:
