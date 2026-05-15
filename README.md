@@ -13,6 +13,46 @@ key: <PERSONAL-ACCESS-TOKEN>
 
 Também é necessário aceitar os termos de uso dos datasets no portal CDS.
 
+## Instalação
+
+Durante desenvolvimento, use a CLI pelo ambiente do projeto:
+
+```bash
+uv run cds-downloader daily --year 2025 --months 10
+```
+
+Para instalar como uma ferramenta local a partir desta pasta:
+
+```bash
+uv tool install .
+```
+
+Depois disso, o comando fica disponível fora da pasta do projeto:
+
+```bash
+cds-downloader daily --year 2025 --months 10 11 12
+```
+
+Em outro computador, publique ou disponibilize este projeto em um repositório Git e instale com:
+
+```bash
+uv tool install git+https://github.com/seu-usuario/cds-downloader.git
+```
+
+Para uso pontual, sem instalação permanente:
+
+```bash
+uvx --from git+https://github.com/seu-usuario/cds-downloader.git cds-downloader daily --year 2025 --months 10
+```
+
+Se o comando instalado não aparecer no terminal, rode:
+
+```bash
+uv tool update-shell
+```
+
+e reabra o terminal.
+
 ## Uso
 
 Fluxo diário, com quatro variáveis agregáveis e duas variáveis acumuladas:
