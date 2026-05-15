@@ -36,7 +36,8 @@ cds-downloader daily --year 2025 --months 10 11 12
 Em outro computador, publique ou disponibilize este projeto em um repositório Git e instale com:
 
 ```bash
-uv tool install git+https://github.com/reginalexavier/cds-downloader.git
+uv tool install git+https://github.com/reginalexavier/cds-downloader.git # acesso publico
+uv tool install git+ssh://git@github.com/reginalexavier/cds-downloader.git # acesso atutenticado
 ```
 
 Para uso pontual, sem instalação permanente:
