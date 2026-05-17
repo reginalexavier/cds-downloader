@@ -1,129 +1,164 @@
 # cds-downloader
 
-CLI simples para baixar dados ERA5-Land via Copernicus Climate Data Store API.
+A small command-line tool for downloading a focused set of ERA5-Land climate variables from the Copernicus Climate Data Store (CDS) API.
 
-## Autenticação
+The tool wraps two practical download workflows:
 
-Configure o arquivo [`~/.cdsapirc`](https://cds.climate.copernicus.eu/how-to-api) antes de baixar dados:
+- `daily`: daily outputs built from daily statistics for regular variables plus daily accumulated values for accumulated variables.
+- `hourly`: hourly outputs, downloaded as one request and one file per variable.
+
+This is intentionally a CLI first, not a general-purpose Python SDK for the CDS API.
+
+## Authentication
+
+Before downloading data, configure your CDS API credentials in [`~/.cdsapirc`](https://cds.climate.copernicus.eu/how-to-api):
 
 ```yaml
 url: https://cds.climate.copernicus.eu/api
 key: <PERSONAL-ACCESS-TOKEN>
 ```
 
-Também é necessário aceitar os termos de uso dos datasets no portal CDS.
+You must also accept the terms of use for each CDS dataset in the CDS portal before requesting data.
 
-## Instalação
+## Installation
 
-Durante desenvolvimento, use a CLI pelo ambiente do projeto:
+During development, run the CLI from the project environment:
 
 ```bash
 uv run cds-downloader daily --year 2025 --months 10
 ```
 
-Para instalar como uma ferramenta local a partir desta pasta:
+To install it as a local tool from this repository:
 
 ```bash
 uv tool install .
 ```
 
-Depois disso, o comando fica disponível fora da pasta do projeto:
+After that, the command is available outside the project directory:
 
 ```bash
 cds-downloader daily --year 2025 --months 10 11 12
 ```
 
-Em outro computador, publique ou disponibilize este projeto em um repositório Git e instale com:
+To install from GitHub:
 
 ```bash
-uv tool install git+https://github.com/reginalexavier/cds-downloader.git # acesso publico
-uv tool install git+ssh://git@github.com/reginalexavier/cds-downloader.git # acesso atutenticado
+uv tool install git+https://github.com/reginalexavier/cds-downloader.git
 ```
 
-Para uso pontual, sem instalação permanente:
+For one-off usage without permanent installation:
 
 ```bash
 uvx --from git+https://github.com/reginalexavier/cds-downloader.git cds-downloader daily --year 2025 --months 10
 ```
 
-Se o comando instalado não aparecer no terminal, rode:
+If the installed command is not available in your shell, run:
 
 ```bash
 uv tool update-shell
 ```
 
-e reabra o terminal.
+Then reopen the terminal.
 
-## Uso
+## Usage
 
-Fluxo diário, com quatro variáveis agregáveis e duas variáveis acumuladas:
-
-```bash
-uv run cds-downloader daily --year 2025 --months 10 11 12
-```
-
-Por padrão, o fluxo diário usa `daily_mean` nas variáveis agregáveis e `00:00` nas acumuladas. Para incluir outras estatísticas:
+Daily workflow, with four variables handled by daily statistics and two accumulated variables:
 
 ```bash
-uv run cds-downloader daily --year 2025 --months 10 --daily-statistics daily_mean daily_minimum daily_maximum
+cds-downloader daily --year 2025 --months 10 11 12
 ```
 
-Para mudar o horário usado nas acumuladas:
+By default, the daily workflow uses `daily_mean` for the daily-statistics variables and `00:00` for accumulated variables. To request more statistics:
 
 ```bash
-uv run cds-downloader daily --year 2025 --months 10 --accumulated-time 00:00
+cds-downloader daily --year 2025 --months 10 --daily-statistics daily_mean daily_minimum daily_maximum
 ```
 
-Fluxo horário, com uma request e um arquivo por variável:
+To change the timestamp used for accumulated variables:
 
 ```bash
-uv run cds-downloader hourly --year 2025 --months 10 11 12
+cds-downloader daily --year 2025 --months 10 --accumulated-time 00:00
 ```
 
-Valide as requests sem chamar a API:
+Hourly workflow, with one request and one output file per variable:
 
 ```bash
-uv run cds-downloader daily --year 2025 --months 10 --dry-run
-uv run cds-downloader hourly --year 2025 --months 10 --dry-run
+cds-downloader hourly --year 2025 --months 10 11 12
 ```
 
-Arquivos são salvos em `data/` por padrão. Use `--output-dir downloads` para escolher outro destino.
+Validate requests without calling the CDS API:
 
-Use `--max-workers` para executar múltiplas requests independentes em paralelo. O padrão é `--max-workers 1`, ou seja, download sequencial. Valores baixos como `2` ou `3` costumam ser mais seguros; valores altos podem apenas aumentar fila, lentidão ou chance de erro por limite do CDS.
+```bash
+cds-downloader daily --year 2025 --months 10 --dry-run
+cds-downloader hourly --year 2025 --months 10 --dry-run
+```
 
-## Variáveis
+Files are written to `data/` by default. Use `--output-dir downloads` or an absolute path to choose another destination.
 
-O CDS oferece muitas variáveis. Esta CLI foi pensada para um conjunto pequeno usado nos fluxos originais:
+Use `--max-workers` to run independent requests in parallel. The default is `--max-workers 1`, meaning sequential downloads. Low values such as `2` or `3` are usually safer; high values can increase queueing, slowdowns, or CDS rate-limit failures.
 
-| Fluxo | Dataset | Variável | Tratamento |
+## Variables
+
+CDS provides many variables. This CLI focuses on the small set used by the original workflows:
+
+| Workflow | Dataset | Variable | Handling |
 | --- | --- | --- | --- |
-| `daily` | `derived-era5-land-daily-statistics` | `2m_dewpoint_temperature` | Estatísticas diárias (`daily_mean` por padrão) |
-| `daily` | `derived-era5-land-daily-statistics` | `2m_temperature` | Estatísticas diárias (`daily_mean` por padrão) |
-| `daily` | `derived-era5-land-daily-statistics` | `10m_u_component_of_wind` | Estatísticas diárias (`daily_mean` por padrão) |
-| `daily` | `derived-era5-land-daily-statistics` | `10m_v_component_of_wind` | Estatísticas diárias (`daily_mean` por padrão) |
-| `daily` | `reanalysis-era5-land` | `surface_solar_radiation_downwards` | Valor acumulado no horário configurado (`00:00` por padrão) |
-| `daily` | `reanalysis-era5-land` | `total_precipitation` | Valor acumulado no horário configurado (`00:00` por padrão) |
-| `hourly` | `reanalysis-era5-land` | Todas as 6 variáveis acima | Série horária, uma request por variável |
+| `daily` | `derived-era5-land-daily-statistics` | `2m_dewpoint_temperature` | Daily statistics (`daily_mean` by default) |
+| `daily` | `derived-era5-land-daily-statistics` | `2m_temperature` | Daily statistics (`daily_mean` by default) |
+| `daily` | `derived-era5-land-daily-statistics` | `10m_u_component_of_wind` | Daily statistics (`daily_mean` by default) |
+| `daily` | `derived-era5-land-daily-statistics` | `10m_v_component_of_wind` | Daily statistics (`daily_mean` by default) |
+| `daily` | `reanalysis-era5-land` | `surface_solar_radiation_downwards` | Accumulated value at the configured timestamp (`00:00` by default) |
+| `daily` | `reanalysis-era5-land` | `total_precipitation` | Accumulated value at the configured timestamp (`00:00` by default) |
+| `hourly` | `reanalysis-era5-land` | All six variables above | Hourly series, one request per variable |
 
-Para baixar outra variável já compatível com o mesmo dataset, use os parâmetros da CLI:
+To request another variable that is compatible with the same dataset, use the CLI options:
 
 ```bash
-uv run cds-downloader hourly --year 2025 --months 10 --variables total_precipitation
-uv run cds-downloader daily --year 2025 --months 10 --daily-variables 2m_temperature
-uv run cds-downloader daily --year 2025 --months 10 --accumulated-variables total_precipitation
+cds-downloader hourly --year 2025 --months 10 --variables total_precipitation
+cds-downloader daily --year 2025 --months 10 --daily-variables 2m_temperature
+cds-downloader daily --year 2025 --months 10 --accumulated-variables total_precipitation
 ```
 
-Para tornar novas variáveis parte dos defaults, edite `cds_downloader/config.py`. Antes de adicionar uma variável ao fluxo `daily`, confira na documentação do dataset se ela pertence ao produto de estatísticas diárias ou se deve ser tratada como acumulada via `reanalysis-era5-land`.
+To make new variables part of the defaults, edit `cds_downloader/config.py`. Before adding a variable to the `daily` workflow, check the CDS dataset documentation to decide whether it belongs to `derived-era5-land-daily-statistics` or should be treated as an accumulated variable from `reanalysis-era5-land`.
 
-## Formatos
+## Formats
 
-O subfluxo diário agregado usa o dataset `derived-era5-land-daily-statistics`. O processo da API não expõe `data_format` ou `download_format`, então esses campos não são enviados. No padrão de uma variável por request usado por esta CLI, o arquivo retornado pelo `cdsapi` é NetCDF/HDF5 e é salvo como `.nc`.
+The daily-statistics subworkflow uses `derived-era5-land-daily-statistics`. That CDS API process does not expose `data_format` or `download_format`, so those fields are not sent. For the one-variable-per-request pattern used by this CLI, `cdsapi` returns a NetCDF/HDF5 file, saved as `.nc`.
 
-As variáveis acumuladas do fluxo diário e todo o fluxo horário usam `reanalysis-era5-land`, que aceita `--data-format` (`netcdf` ou `grib`) e `--download-format` (`unarchived` ou `zip`).
+The accumulated variables in the daily workflow and the entire hourly workflow use `reanalysis-era5-land`, which supports `--data-format` (`netcdf` or `grib`) and `--download-format` (`unarchived` or `zip`).
 
-## Referências
+## Development
+
+Run checks locally with:
+
+```bash
+uv run ruff format --check
+uv run ruff check
+uv run pytest
+```
+
+Optional pre-commit setup:
+
+```bash
+uv run task pci  # install Git hooks
+uv run task pcr  # run hooks on all files
+uv run task pcu  # update hook versions
+```
+
+The repository also includes a GitHub Actions workflow that runs formatting checks, linting, and tests on Linux and Windows.
+
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
+
+## Data Terms
+
+The MIT License applies only to this software. Data downloaded with this tool is provided by the Copernicus Climate Data Store and remains subject to the terms and licenses of the corresponding CDS datasets. Users are responsible for reviewing and accepting the applicable CDS dataset terms before downloading or using the data.
+
+## References
 
 - CDS API setup: https://cds.climate.copernicus.eu/how-to-api
-- Processo API `derived-era5-land-daily-statistics`: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/derived-era5-land-daily-statistics
-- Processo API `reanalysis-era5-land`: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/reanalysis-era5-land
-- Documentação ERA5 family post-processed daily statistics: https://confluence.ecmwf.int/display/CKB/ERA5+family+post-processed+daily+statistics+documentation
+- CDS terms of use: https://cds.climate.copernicus.eu/licences/terms-of-use-cds
+- CDS API process `derived-era5-land-daily-statistics`: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/derived-era5-land-daily-statistics
+- CDS API process `reanalysis-era5-land`: https://cds.climate.copernicus.eu/api/retrieve/v1/processes/reanalysis-era5-land
+- ERA5 family post-processed daily statistics documentation: https://confluence.ecmwf.int/display/CKB/ERA5+family+post-processed+daily+statistics+documentation
