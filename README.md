@@ -127,6 +127,21 @@ Files are written to `data/` by default. Use `--output-dir downloads` or an abso
 
 Use `--max-workers` to run independent requests in parallel. The default is `--max-workers 1`, meaning sequential downloads. Low values such as `2` or `3` are usually safer; high values can increase queueing, slowdowns, or CDS rate-limit failures.
 
+### Spatial Area
+
+By default, requests use the bounding box from the original workflow:
+
+```text
+north=-15.36 west=-55.91 south=-17.24 east=-53.14
+```
+
+Use `--area` to request another spatial subset. The order follows the CDS API convention: `north west south east`.
+
+```bash
+cds-downloader daily --year 2025 --months 10 --area -15.36 -55.91 -17.24 -53.14
+cds-downloader hourly --year 2025 --months 10 --area -14.22 -57.52 -18.02 -53.62
+```
+
 ## Variables
 
 CDS provides many variables. This CLI focuses on the small set used by the original workflows:
