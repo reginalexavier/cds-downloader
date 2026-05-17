@@ -1,5 +1,10 @@
 # cds-downloader
 
+[![CI](https://github.com/reginalexavier/cds-downloader/actions/workflows/ci.yml/badge.svg)](https://github.com/reginalexavier/cds-downloader/actions/workflows/ci.yml)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-46a0f5.svg)](https://docs.astral.sh/ruff/)
+
 A small command-line tool for downloading a focused set of ERA5-Land climate variables from the Copernicus Climate Data Store (CDS) API.
 
 The tool wraps two practical download workflows:
