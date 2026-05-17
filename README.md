@@ -18,6 +18,19 @@ url: https://cds.climate.copernicus.eu/api
 key: <PERSONAL-ACCESS-TOKEN>
 ```
 
+On Linux or macOS, you can create it from the shell without printing the token:
+
+```bash
+printf "CDS Personal Access Token: "
+stty -echo
+IFS= read -r CDS_TOKEN
+stty echo
+printf "\n"
+printf "url: https://cds.climate.copernicus.eu/api\nkey: %s\n" "$CDS_TOKEN" > ~/.cdsapirc
+chmod 600 ~/.cdsapirc
+unset CDS_TOKEN
+```
+
 You must also accept the terms of use for each CDS dataset in the CDS portal before requesting data.
 
 ## Installation
