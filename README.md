@@ -58,13 +58,25 @@ After that, the command is available outside the project directory:
 cds-downloader daily --year 2025 --months 10 11 12
 ```
 
-To install from GitHub:
+To install the latest stable tagged version from GitHub:
+
+```bash
+uv tool install git+https://github.com/reginalexavier/cds-downloader.git@v0.1.0
+```
+
+To install the latest development version from the default branch:
 
 ```bash
 uv tool install git+https://github.com/reginalexavier/cds-downloader.git
 ```
 
-For one-off usage without permanent installation:
+For one-off usage without permanent installation, pin a released version when you want reproducible behavior:
+
+```bash
+uvx --from git+https://github.com/reginalexavier/cds-downloader.git@v0.1.0 cds-downloader daily --year 2025 --months 10
+```
+
+Or run the latest development version:
 
 ```bash
 uvx --from git+https://github.com/reginalexavier/cds-downloader.git cds-downloader daily --year 2025 --months 10
