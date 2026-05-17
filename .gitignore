@@ -6,7 +6,16 @@ build/
 dist/
 wheels/
 *.egg-info
+
+# Local secrets and environment files
+.cdsapirc
+.env
+.env.*
+
+# Downloaded climate data
 *.nc
+*.grib
+*.grib2
 
 # Virtual environments
 .venv
