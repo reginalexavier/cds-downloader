@@ -104,6 +104,20 @@ By default, the daily workflow uses `daily_mean` for the daily-statistics variab
 cds-downloader daily --year 2025 --months 10 --daily-statistics daily_mean daily_minimum daily_maximum
 ```
 
+To download only one daily-statistics variable, disable the accumulated-variable subworkflow:
+
+```bash
+cds-downloader daily --year 2025 --months 10 --daily-variables 2m_temperature --no-accumulated-variables
+```
+
+To download only one accumulated variable, disable the daily-statistics subworkflow:
+
+```bash
+cds-downloader daily --year 2025 --months 10 --no-daily-variables --accumulated-variables total_precipitation
+```
+
+This is the recommended way to download daily precipitation totals from ERA5-Land. For accumulated variables, the value timestamped at `YYYY-MM-DD 00:00` represents the accumulation over the previous day. If you need strict calendar-day labels or exact calendar-month precipitation totals, account for this one-day timestamp shift when selecting and interpreting the output.
+
 To change the timestamp used for accumulated variables:
 
 ```bash
@@ -160,8 +174,8 @@ To request another variable that is compatible with the same dataset, use the CL
 
 ```bash
 cds-downloader hourly --year 2025 --months 10 --variables total_precipitation
-cds-downloader daily --year 2025 --months 10 --daily-variables 2m_temperature
-cds-downloader daily --year 2025 --months 10 --accumulated-variables total_precipitation
+cds-downloader daily --year 2025 --months 10 --daily-variables 2m_temperature --no-accumulated-variables
+cds-downloader daily --year 2025 --months 10 --no-daily-variables --accumulated-variables total_precipitation
 ```
 
 To make new variables part of the defaults, edit `cds_downloader/config.py`. Before adding a variable to the `daily` workflow, check the CDS dataset documentation to decide whether it belongs to `derived-era5-land-daily-statistics` or should be treated as an accumulated variable from `reanalysis-era5-land`.

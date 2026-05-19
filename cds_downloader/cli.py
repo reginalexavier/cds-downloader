@@ -100,10 +100,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Variables handled by the daily statistics dataset.",
     )
     daily.add_argument(
+        "--no-daily-variables",
+        action="store_true",
+        help="Skip variables handled by the daily statistics dataset.",
+    )
+    daily.add_argument(
         "--accumulated-variables",
         nargs="+",
         default=list(DAILY_ACCUMULATED_VARIABLES),
         help="Accumulated variables downloaded from the hourly dataset.",
+    )
+    daily.add_argument(
+        "--no-accumulated-variables",
+        action="store_true",
+        help="Skip accumulated variables downloaded from the hourly dataset.",
     )
     daily.add_argument(
         "--accumulated-time",
@@ -135,13 +145,16 @@ def tasks_from_args(args: argparse.Namespace):
     )
 
     if args.command == "daily":
+        if args.no_daily_variables and args.no_accumulated_variables:
+            raise ValueError("At least one daily subworkflow must be enabled.")
+
         return build_daily_tasks(
             DailyRequestOptions(
                 common=common,
                 daily_statistics=args.daily_statistics,
                 accumulated_time=args.accumulated_time,
-                daily_variables=args.daily_variables,
-                accumulated_variables=args.accumulated_variables,
+                daily_variables=[] if args.no_daily_variables else args.daily_variables,
+                accumulated_variables=[] if args.no_accumulated_variables else args.accumulated_variables,
             )
         )
 
