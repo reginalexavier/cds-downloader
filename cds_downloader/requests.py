@@ -11,6 +11,7 @@ from .config import (
     DAILY_AGGREGATED_VARIABLES,
     DAILY_DATASET,
     DEFAULT_DAILY_FREQUENCY,
+    DEFAULT_DAILY_STATISTICS_BY_VARIABLE,
     DEFAULT_TIME_ZONE,
     HOURLY_DATASET,
     HOURLY_VARIABLES,
@@ -50,7 +51,7 @@ class DailyRequestOptions:
     """Options for the composed daily workflow."""
 
     common: CommonRequestOptions
-    daily_statistics: Iterable[str]
+    daily_statistics: Iterable[str] | None
     accumulated_time: str
     daily_variables: Iterable[str] = DAILY_AGGREGATED_VARIABLES
     accumulated_variables: Iterable[str] = DAILY_ACCUMULATED_VARIABLES
@@ -113,6 +114,12 @@ def file_extension(data_format: str, download_format: str) -> str:
     return "grib"
 
 
+def daily_statistics_for_variable(variable: str, statistics: Iterable[str] | None) -> tuple[str, ...]:
+    if statistics is not None:
+        return tuple(statistics)
+    return DEFAULT_DAILY_STATISTICS_BY_VARIABLE.get(variable, ("daily_mean",))
+
+
 def build_daily_tasks(options: DailyRequestOptions) -> list[DownloadTask]:
     common = options.common
     months = normalize_numbers(common.months, minimum=1, maximum=12)
@@ -123,7 +130,7 @@ def build_daily_tasks(options: DailyRequestOptions) -> list[DownloadTask]:
 
     tasks: list[DownloadTask] = []
     for variable in options.daily_variables:
-        for statistic in options.daily_statistics:
+        for statistic in daily_statistics_for_variable(variable, options.daily_statistics):
             # The CDS process for post-processed daily statistics exposes neither
             # data_format nor download_format. The retrieved asset is NetCDF/HDF5
             # for the one-variable-per-request pattern used by this CLI.

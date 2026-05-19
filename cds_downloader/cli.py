@@ -90,8 +90,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--daily-statistics",
         nargs="+",
         choices=DAILY_STATISTICS,
-        default=["daily_mean"],
-        help="Daily statistics for aggregated variables.",
+        default=None,
+        help="Daily statistics for aggregated variables. Defaults are variable-specific.",
     )
     daily.add_argument(
         "--daily-variables",

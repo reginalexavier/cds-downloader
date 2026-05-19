@@ -98,7 +98,16 @@ Daily workflow, with four variables handled by daily statistics and two accumula
 cds-downloader daily --year 2025 --months 10 11 12
 ```
 
-By default, the daily workflow uses `daily_mean` for the daily-statistics variables and `00:00` for accumulated variables. To request more statistics:
+By default, the daily workflow uses variable-specific statistics:
+
+| Variable | Default statistics |
+| --- | --- |
+| `2m_dewpoint_temperature` | `daily_minimum`, `daily_maximum` |
+| `2m_temperature` | `daily_minimum`, `daily_maximum` |
+| `10m_u_component_of_wind` | `daily_mean` |
+| `10m_v_component_of_wind` | `daily_mean` |
+
+Accumulated variables use `00:00` by default. To override the daily statistics for the selected daily-statistics variables:
 
 ```bash
 cds-downloader daily --year 2025 --months 10 --daily-statistics daily_mean daily_minimum daily_maximum
@@ -162,8 +171,8 @@ CDS provides many variables. This CLI focuses on the small set used by the origi
 
 | Workflow | Dataset | Variable | Handling |
 | --- | --- | --- | --- |
-| `daily` | `derived-era5-land-daily-statistics` | `2m_dewpoint_temperature` | Daily statistics (`daily_mean` by default) |
-| `daily` | `derived-era5-land-daily-statistics` | `2m_temperature` | Daily statistics (`daily_mean` by default) |
+| `daily` | `derived-era5-land-daily-statistics` | `2m_dewpoint_temperature` | Daily `minimum` and `maximum` by default |
+| `daily` | `derived-era5-land-daily-statistics` | `2m_temperature` | Daily `minimum` and `maximum` by default |
 | `daily` | `derived-era5-land-daily-statistics` | `10m_u_component_of_wind` | Daily statistics (`daily_mean` by default) |
 | `daily` | `derived-era5-land-daily-statistics` | `10m_v_component_of_wind` | Daily statistics (`daily_mean` by default) |
 | `daily` | `reanalysis-era5-land` | `surface_solar_radiation_downwards` | Accumulated value at the configured timestamp (`00:00` by default) |

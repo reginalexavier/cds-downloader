@@ -7,6 +7,7 @@ from cds_downloader.requests import (
     HourlyRequestOptions,
     build_daily_tasks,
     build_hourly_tasks,
+    daily_statistics_for_variable,
     file_extension,
     normalize_numbers,
     normalize_time,
@@ -48,6 +49,36 @@ def test_build_daily_tasks_splits_aggregated_and_accumulated_variables():
     assert tasks[2].request["data_format"] == "netcdf"
     assert tasks[2].request["download_format"] == "unarchived"
     assert tasks[2].target == Path("data/daily_total_precipitation_accumulated_2025.nc")
+
+
+def test_daily_statistics_defaults_are_variable_specific():
+    tasks = build_daily_tasks(
+        DailyRequestOptions(
+            common=CommonRequestOptions(
+                year=2025,
+                months=["10"],
+                days=["1"],
+                area=[-15.36, -55.91, -17.24, -53.14],
+                output_dir=Path("data"),
+                data_format="netcdf",
+                download_format="unarchived",
+            ),
+            daily_statistics=None,
+            accumulated_time="0:00",
+            daily_variables=["2m_temperature", "10m_u_component_of_wind"],
+            accumulated_variables=[],
+        )
+    )
+
+    assert [task.request["daily_statistic"] for task in tasks] == [
+        "daily_minimum",
+        "daily_maximum",
+        "daily_mean",
+    ]
+
+
+def test_daily_statistics_override_applies_to_selected_variables():
+    assert daily_statistics_for_variable("2m_temperature", ["daily_mean"]) == ("daily_mean",)
 
 
 def test_build_hourly_tasks_creates_one_request_per_variable():

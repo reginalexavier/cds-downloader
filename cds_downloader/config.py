@@ -10,6 +10,13 @@ DAILY_AGGREGATED_VARIABLES = (
     "10m_v_component_of_wind",
 )
 
+DEFAULT_DAILY_STATISTICS_BY_VARIABLE = {
+    "2m_dewpoint_temperature": ("daily_minimum", "daily_maximum"),
+    "2m_temperature": ("daily_minimum", "daily_maximum"),
+    "10m_u_component_of_wind": ("daily_mean",),
+    "10m_v_component_of_wind": ("daily_mean",),
+}
+
 DAILY_ACCUMULATED_VARIABLES = (
     "surface_solar_radiation_downwards",
     "total_precipitation",

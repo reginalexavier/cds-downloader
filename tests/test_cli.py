@@ -4,6 +4,7 @@ from cds_downloader.downloader import print_dry_run
 
 EXPECTED_HOURLY_TASKS = 2
 EXPECTED_SINGLE_DAILY_TASK = 1
+EXPECTED_TEMPERATURE_DEFAULT_TASKS = 2
 
 
 def test_help_mentions_cds_api_token_setup(capsys):
@@ -85,9 +86,10 @@ def test_daily_can_download_only_one_aggregated_variable():
 
     tasks = tasks_from_args(args)
 
-    assert len(tasks) == EXPECTED_SINGLE_DAILY_TASK
+    assert len(tasks) == EXPECTED_TEMPERATURE_DEFAULT_TASKS
     assert tasks[0].dataset == "derived-era5-land-daily-statistics"
     assert tasks[0].request["variable"] == "2m_temperature"
+    assert [task.request["daily_statistic"] for task in tasks] == ["daily_minimum", "daily_maximum"]
 
 
 def test_daily_can_download_only_one_accumulated_variable():
