@@ -17,6 +17,9 @@ DAILY_ACCUMULATED_VARIABLES = (
 
 HOURLY_VARIABLES = DAILY_AGGREGATED_VARIABLES + DAILY_ACCUMULATED_VARIABLES
 
+# The calculation documentation mentions daily_sum, but the live
+# derived-era5-land-daily-statistics API process currently exposes only these
+# three choices for ERA5-Land.
 DAILY_STATISTICS = (
     "daily_mean",
     "daily_minimum",
