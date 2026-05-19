@@ -1,6 +1,6 @@
 [project]
 name = "cds-downloader"
-version = "0.1.0"
+version = "0.2.0"
 description = "Simple CLI for downloading ERA5-Land data from the Copernicus CDS API"
 readme = "README.md"
 requires-python = ">=3.12"
